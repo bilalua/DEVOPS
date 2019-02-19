@@ -1,0 +1,209 @@
+﻿<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
+    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <h2>EMPLOYEE DATA</h2>
+        <p>Will Print Employee Data if it exists.</p>
+        <div id="body">
+            <ul id="employee"></ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <h2>Employees Record</h2>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal" >Add New Employee</button><br /><br />
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Age
+                </th>
+            </tr>
+        </thead>
+        <tbody class="tbody"></tbody>
+    </table>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dissmiss="modal"><span aria-hidden="true">×</span></button>*@
+                <button type="button" class="close" data-dismiss="modal">×</button>
+                <h4 class="modal-title" id="myModalLabel">Add Employee</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="ID">Employee ID</label>
+                        <input type="text" class="form-control" id="ID" placeholder="Id" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Name">Name</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Age">Age</label>
+                        <input type="text" class="form-control" id="Age" placeholder="Age" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnAdd" onclick="Add();">Add</button>
+                <button type="button" class="btn btn-primary" id="btnUpdate" onclick="Update();">Update</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript">
+        //$(function (result) {
+        //    $.getJSON('/api/employees', function (employeeJsonPayload) {
+        //        $(employeeJsonPayload).each(function (i, item) {
+        //            $('#employee').append('<li>' + 'Employee - ID : ' + item.ID + '     Employee - Name  : ' + item.Name + '     Employee - Age  : ' + item.Age + '</li>');
+        //        });
+        //    });
+        //});
+
+        $(function () { loadData(); })
+
+
+        function Add() {
+            var empObj = {
+                ID: $('#ID').val(),
+                Name: $('#Name').val(),
+                Age: $('#Age').val(),
+            };
+            $.ajax({
+                url: "/api/employees",
+                data: JSON.stringify(empObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        } 
+
+        function loadData() {
+            $.ajax({
+                url: "/api/Employees",
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<tr>';
+                        html += '<td>' + item.ID + '</td>';
+                        html += '<td>' + item.Name + '</td>';
+                        html += '<td>' + item.Age + '</td>';
+                        html += '<td><a href="#" onclick="return  Delete(' + item.ID + ')">Delete</a></td>';
+                        html += '</tr>';
+                    });
+                    $('.tbody').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function get() {
+            $('#Name').css('border-color', 'lightgrey');
+            $('#Age').css('border-color', 'lightgrey');
+            $('#State').css('border-color', 'lightgrey');
+            $('#Country').css('border-color', 'lightgrey');
+            $.ajax({
+                url: "/api/Employees/" + EmpID,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            return false;
+        }
+
+        function Update() {
+            var empObj = {
+                ID: $('#ID').val(),
+                Name: $('#Name').val(),
+                Age: $('#Age').val()
+            };
+            $.ajax({
+                url: "/Api/Employees",
+                data: JSON.stringify(empObj),
+                type: "PUT",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    loadData();
+                    $('#myModal').modal('hide');
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function Delete(ID) {
+                $.ajax({
+                    url: "/api/Employees/" + ID,
+                    type: "Delete",
+                    contentType: "application/json;charset=UTF-8",
+                    dataType: "json",
+                    success: function (result) {
+                        loadData();
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+        }
+
+        function getbyID(EmpID) {
+            $('#ID').css('border-color', 'lightgrey');
+            $('#Name').css('border-color', 'lightgrey');
+            $('#Age').css('border-color', 'lightgrey');
+            $.ajax({
+                url: "/Api/Employees?empID=" + EmpID,
+                typr: "GET",
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#ID').val(result.ID);
+                    $('#Name').val(result.Name);
+                    $('#Age').val(result.Age);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            return false;
+        }
+    </script>
+}
+
